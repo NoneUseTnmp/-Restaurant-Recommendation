@@ -12,12 +12,7 @@ def find_common_res(user1,user2):
     return s1.intersection(s2)
     
 def cosine_similarity(vec1, vec2):
-    """
-    計算兩個向量之間的餘弦相似性
-    :param vec1: 向量 a 
-    :param vec2: 向量 b
-    :return: sim
-    """
+
     vec1 = np.mat(vec1)
     vec2 = np.mat(vec2)
     num = float(vec1 * vec2.T)
@@ -27,7 +22,7 @@ def cosine_similarity(vec1, vec2):
     return sim
    
 def cal_user_similarity_with_movie_rating(user1,user2,res_id):
-    """計算兩個user對於特定餐廳評分的相似度"""
+ 
     u1 = res[res["userid"]==user1]
     u2 = res[res["userid"]==user2]
     vec1 = u1[u1.resid.isin([res_id])].sort_values(by="resid")["star"].values
@@ -49,12 +44,12 @@ def recommend(user,num=10):
         sim = cal_user_similarity_with_movie_rating(user,other_user,common_res)
         user_similarity.append([other_user,sim])
    
-    #find top 10 similar user
+
     user_similarity = np.array(user_similarity)
     sorted_index = np.argsort(user_similarity, axis=0)[:,1][::-1][:10]
     top10_similar_user = user_similarity[:,0][sorted_index]
     
-    #find the res the user haven't seen
+
     vis_res=res.loc[res["userid"]==user,"resid"].values
     not_vis_res = defaultdict(list) 
     for similar_user in top10_similar_user:
@@ -68,11 +63,11 @@ def recommend(user,num=10):
         elif _res[0] not in vis_res:
             not_vis_res[_res[0]].append(_res[1])
     
-    #average same res rating
+
     for _res in not_vis_res:
         not_vis_res[_res] = np.mean(not_vis_res[_res])
     
-    #get top 10 ratings by sorting it 
+
     top10_res = sorted(not_vis_res.items(), key=lambda x: x[1], reverse=True)
     return[_res for _res,rating in top10_res][:num]
     
